@@ -52,7 +52,6 @@ int main(int argc, char *argv[])
     std::string yamlFilename(argv[2]);
 
     const auto image = cv::imread(imageFilename, cv::IMREAD_COLOR);
-    cv::Mat imageUndistorted;
 
     cv::FileStorage fs(yamlFilename, cv::FileStorage::READ);
     cv::FileNode distortionCoefficients = fs[detail::distortionCoefficientsStr];
@@ -75,8 +74,10 @@ int main(int argc, char *argv[])
 
     if (status)
     {
+        cv::Mat imageUndistorted = worker.getUndistortedImage();
+
         cv::imshow("original", image);
-        cv::imshow("undistorted", worker.getUndistortedImage());
+        cv::imshow("undistorted", imageUndistorted);
         cv::waitKey(0);
 
         size_t lastindex = imageFilename.find_last_of("."); 
