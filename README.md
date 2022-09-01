@@ -86,22 +86,22 @@ where YAML format for point entries provided at intro section
 
 # API
 
-    Undistortion::undistort(const cv::Mat &input, const DistortionCoefficients& kd, cv::Mat &output) -> bool
+    undistort(const cv::Mat &input, const DistortionCoefficients& kd) -> bool
 
-Undistorts input image with provided coefficients.
+Undistorts input image with provided coefficients. Returns true on success, false on failure
 
-Returns true on success, false on failure
+    undistort(const cv::Mat &input, const std::vector<std::vector<cv::Point2d>> &pointsDistorted) -> bool
 
-    Undistortion::undistort(const cv::Mat &input, const std::vector<std::vector<cv::Point2d>> &pointsDistorted, cv::Mat &output) -> bool
-
-Undistorts input image with provided set of points.
-
-Returns true on success, false on failure
+Undistorts input image with provided set of points. Returns true on success, false on failure
 
     getDistortionCoefficients() -> DistortionCoefficients
 
-Get estimated distortion coefficients, after a call to ```Undistortion::undistort```
+Get estimated distortion coefficients, after a call to ```Undistortion::undistort``` Returns coefficient set of 7 params: [ k1, k2, p1, p2, k3, cx, cy ]
 
-Returns coefficient set of 7 params: [ k1, k2, p1, p2, k3, cx, cy ]
+    getUndistortedImage() -> cv::Mat
 
-See ```sources/main.cpp``` for example API usage.
+Get undistorted image, after a call to ```Undistortion::undistort```
+
+</br>
+
+Refer to ```sources/main.cpp``` for example API usage.

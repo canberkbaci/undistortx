@@ -36,12 +36,11 @@ void testUndistort1()
     pointsOnCurves.push_back(curve_2);
     pointsOnCurves.push_back(curve_3);
 
-    cv::Mat output;
     cv::Mat input = cv::imread("../tests/data/1.jpg", cv::IMREAD_COLOR);
     undistortion::Undistortion worker;
-    worker.undistort(input, pointsOnCurves, output);
+    worker.undistort(input, pointsOnCurves);
     const DistortionCoefficients actual = worker.getDistortionCoefficients();
-    const DistortionCoefficients expected{2.19668e-16, 1.53243e-18, 5.91584e-14, -1.14718e-13, 1.17589e-18, 640, 360};
+    const DistortionCoefficients expected{2.19668e-16, 1.53243e-18, -1.14718e-13, 5.91584e-14, 1.17589e-18, 640, 360};
     assert(actual == expected);
 }
 
@@ -83,12 +82,11 @@ void testUndistort2()
     pointsOnCurves.push_back(curve_3);
     pointsOnCurves.push_back(curve_4);
 
-    cv::Mat output;
     cv::Mat input = cv::imread("../tests/data/2.jpg", cv::IMREAD_COLOR);
     undistortion::Undistortion worker;
-    worker.undistort(input, pointsOnCurves, output);
+    worker.undistort(input, pointsOnCurves);
     const DistortionCoefficients actual = worker.getDistortionCoefficients();
-    const DistortionCoefficients expected{3.73507e-08, 4.9776e-11, -3.94392e-07, -3.60307e-05, 8.35396e-16, 300.154, 200.356};
+    const DistortionCoefficients expected{3.79598e-08, 5.04935e-11, -3.57413e-05, -3.94738e-07, 8.26014e-16, 300.18, 200.356};
 
     assert(actual == expected);
 }

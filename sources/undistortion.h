@@ -57,10 +57,11 @@ namespace undistortion
     class Undistortion
     {
     public:
-        bool undistort(const cv::Mat &input, const DistortionCoefficients& kd_, cv::Mat &output);
-        bool undistort(const cv::Mat &input, const std::vector<std::vector<cv::Point2d>> &pd, cv::Mat &output);
+        bool undistort(const cv::Mat &input, const DistortionCoefficients& kd_);
+        bool undistort(const cv::Mat &input, const std::vector<std::vector<cv::Point2d>> &pd);
 
         DistortionCoefficients getDistortionCoefficients() { return kd; };
+        cv::Mat getUndistortedImage() { return warped; };
 
     private:
         void calculateDistortionCoefficients(const std::vector<std::vector<cv::Point2d>> &points);

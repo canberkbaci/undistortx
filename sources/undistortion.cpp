@@ -3,7 +3,7 @@
 
 #include <ceres/ceres.h>
 
-using Vec6 = Eigen::Matrix<double, 7, 1>;
+using Vec7 = Eigen::Matrix<double, 7, 1>;
 
 namespace undistortion
 {
@@ -14,11 +14,11 @@ namespace undistortion
             const auto dx = pd.x - kd.cx;
             const auto dy = pd.y - kd.cy;
             const auto r2 = pow(dx, 2) + pow(dy, 2);
-            const auto f = 1 + kd.k1 * r2 + kd.k2 * pow(r2, 2) + kd.k3 * pow(r2, 3);
+            const auto f = kd.k1 * r2 + kd.k2 * pow(r2, 2) + kd.k3 * pow(r2, 3);
 
             cv::Point2d pu;
-            pu.x = kd.cx + (f * dx) + (kd.p2 * (r2 + 2 * pow(dx, 2))) + (2 * kd.p1 * dx * dy);
-            pu.y = kd.cy + (f * dy) + (kd.p1 * (r2 + 2 * pow(dy, 2))) + (2 * kd.p2 * dx * dy);
+            pu.x = pd.x + (dx * f) + (kd.p1 * (r2 + 2 * pow(dx, 2))) + (2 * kd.p2 * dx * dy);
+            pu.y = pd.y + (dy * f) + (kd.p2 * (r2 + 2 * pow(dy, 2))) + (2 * kd.p1 * dx * dy);
             return pu;
         }
 
@@ -65,7 +65,7 @@ namespace undistortion
 
     bool UndistortionCostFunctor::operator()(const double *coeffs, double *residual) const
     {
-        Vec6 kd_(coeffs);
+        Vec7 kd_(coeffs);
 
         DistortionCoefficients kd;
         kd.k1 = kd_(0);
@@ -85,7 +85,7 @@ namespace undistortion
     void Undistortion::calculateDistortionCoefficients(const std::vector<std::vector<cv::Point2d>> &points)
     {
         // initial guess
-        Vec6 kd_vec;
+        Vec7 kd_vec;
         kd_vec(0) = 0;
         kd_vec(1) = 0;
         kd_vec(2) = 0;
@@ -236,7 +236,7 @@ namespace undistortion
         // warped = warped(bbox);
     }
 
-    bool Undistortion::undistort(const cv::Mat &input, const DistortionCoefficients &kd_, cv::Mat &output)
+    bool Undistortion::undistort(const cv::Mat &input, const DistortionCoefficients &kd_)
     {
         kd = kd_;
         auto status = false;
@@ -246,8 +246,6 @@ namespace undistortion
         {
             calculateDistortionMapping(kd);
             warp(input, map);
-
-            output = warped.clone();
             status = true;
         }
         catch (const error::UndistortionError &error)
@@ -258,7 +256,7 @@ namespace undistortion
         return status;
     }
 
-    bool Undistortion::undistort(const cv::Mat &input, const std::vector<std::vector<cv::Point2d>> &pd, cv::Mat &output)
+    bool Undistortion::undistort(const cv::Mat &input, const std::vector<std::vector<cv::Point2d>> &pd)
     {
         auto status = false;
         resolution = cv::Size(input.cols, input.rows);
@@ -268,8 +266,6 @@ namespace undistortion
             calculateDistortionCoefficients(pd);
             calculateDistortionMapping(kd);
             warp(input, map);
-
-            output = warped.clone();
             status = true;
         }
         catch (const error::UndistortionError &error)

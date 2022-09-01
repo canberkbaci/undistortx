@@ -55,29 +55,28 @@ int main(int argc, char *argv[])
     cv::Mat imageUndistorted;
 
     cv::FileStorage fs(yamlFilename, cv::FileStorage::READ);
-
     cv::FileNode distortionCoefficients = fs[detail::distortionCoefficientsStr];
+    undistortion::Undistortion worker;
+
     if (distortionCoefficients.empty())
     {
         std::cout << "Undistortion by estimating coefficients..." << std::endl;
 
         const auto pds = readPoints(fs);
-        undistortion::Undistortion worker;
-        status = worker.undistort(image, pds, imageUndistorted);
+        status = worker.undistort(image, pds);
     }
     else
     {
         std::cout << "Undistortion with known coefficients..." << std::endl;
 
         const auto kd = readDistortionCoefficients(fs);
-        undistortion::Undistortion worker;
-        status = worker.undistort(image, kd, imageUndistorted);
+        status = worker.undistort(image, kd);
     }
 
     if (status)
     {
         cv::imshow("original", image);
-        cv::imshow("undistorted", imageUndistorted);
+        cv::imshow("undistorted", worker.getUndistortedImage());
         cv::waitKey(0);
 
         size_t lastindex = imageFilename.find_last_of("."); 
